@@ -61,41 +61,43 @@ class DefaultController extends AbstractController
             /** @var UploadedFile $photo */
             $photo = $form->get('photo')->getData();
 
-            // Avant de déplacer le fichier dans notre projet, nous devons déconstruire le nom du fichier pour le sécuriser.
+            if($photo) {
+                // Avant de déplacer le fichier dans notre projet, nous devons déconstruire le nom du fichier pour le sécuriser.
 
-            // ============================ 1ère ETAPE ============================ //
-            # On variabilise l'extension grâce à la méthode guessExtension() d'UploadedFile
-            $extension = '.' . $photo->guessExtension();
+                // ============================ 1ère ETAPE ============================ //
+                # On variabilise l'extension grâce à la méthode guessExtension() d'UploadedFile
+                $extension = '.' . $photo->guessExtension();
 
-            # pathinfo() est une fonction native de PHP, elle permet de récupérer des infos d'un fichier uploadé..
-            $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
+                # pathinfo() est une fonction native de PHP, elle permet de récupérer des infos d'un fichier uploadé..
+                $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
 
-            # On a injecté l'objet Slugger pour pouvoir "assainir" le nom du fichier.
-                    # Cela retire les accents et espaces (=> '-') du nom du fichier..
+                # On a injecté l'objet Slugger pour pouvoir "assainir" le nom du fichier.
+                # Cela retire les accents et espaces (=> '-') du nom du fichier..
 //            $safeFilename = $slugger->slug($originalFilename);
-            $safeFilename = $slugger->slug($employe->getFullname());
+                $safeFilename = $slugger->slug($employe->getFullname());
 
-            // ============================ 2ème ETAPE ============================ //
-            # On reconstruit le nom du fichier grâce à $safeFilename, un id unique et l'extension.
-            $newFilename = $safeFilename . '_' . uniqid() . $extension;
-//dd($this->getParameter('uploads_dir'));
-            // ============================ 3ème ETAPE ============================ //
-            # On déplace le fichier dans le dossier voulu (choisi), qui est définit dans service.yaml (parameters)
+                // ============================ 2ème ETAPE ============================ //
+                # On reconstruit le nom du fichier grâce à $safeFilename, un id unique et l'extension.
+                $newFilename = $safeFilename . '_' . uniqid() . $extension;
 
-            try {
-                // On essaye de move() le fichier dans notre dossier 'public/uploads'
-                $photo->move($this->getParameter('uploads_dir'), $newFilename);
-                // On set le nom de la photo en BDD
-                $employe->setPhoto($newFilename);
+                // ============================ 3ème ETAPE ============================ //
+                # On déplace le fichier dans le dossier voulu (choisi), qui est définit dans service.yaml (parameters)
 
-            } catch(FileException $exception) {
-                // Pour avoir le message de l'Exception lancée, on getMessage()
-                     # => $exception->getMessage();
+                try {
+                    // On essaye de move() le fichier dans notre dossier 'public/uploads'
+                    $photo->move($this->getParameter('uploads_dir'), $newFilename);
+                    // On set le nom de la photo en BDD
+                    $employe->setPhoto($newFilename);
 
-                // Si le move() du fichier a échoué, alors l'erreur lancée est attrapée.
-                // L'erreur est invisible pour l'utilisateur et le code suivant sera exécuté.
-                $this->addFlash('warning', 'Problème avec l\'upload du fichier, veuillez réessayer.');
-                return $this->redirectToRoute('show_home');
+                } catch(FileException $exception) {
+                    // Pour avoir le message de l'Exception lancée, on getMessage()
+                    # => $exception->getMessage();
+
+                    // Si le move() du fichier a échoué, alors l'erreur lancée est attrapée.
+                    // L'erreur est invisible pour l'utilisateur et le code suivant sera exécuté.
+                    $this->addFlash('warning', 'Problème avec l\'upload du fichier, veuillez réessayer.');
+                    return $this->redirectToRoute('show_home');
+                }
             }
 
             /* Cet exemple : $form->get('prenom')->getData();
@@ -157,5 +159,15 @@ class DefaultController extends AbstractController
         $entityManager->flush();
 
         return $this->redirectToRoute('show_home');
+    }
+
+    /**
+     * @Route("/voir-fiche-employe_{id}", name="show_employe", methods={"GET"})
+     */
+    public function showEmploye(Employe $employe): Response
+    {
+        return $this->render('default/show_employe.html.twig', [
+            'employe' => $employe
+        ]);
     }
 }

@@ -45,7 +45,7 @@
                     {% for employe in employes | reverse %}
                         <tr>
                             <td class="text-center">{{ employe.id }}</td>
-                            <td class="text-center">{{ employe.prenom | title }}</td>
+                            <td class="text-center"><a href="{{ path('show_employe', {'id': employe.id}) }}" class="text-decoration-none text-dark">{{ employe.prenom | title }}</a></td>
                             <td class="text-center">{{ employe.nom | upper }}</td>
                             <td class="text-center">{{ employe.telephone }}</td>
                             <td class="text-center">{{ employe.email | lower }}</td>
@@ -53,7 +53,7 @@
                             <td class="text-center">{{ employe.poste | capitalize }}</td>
                             <td class="text-center">{{ employe.salaire }}</td>
                             <td class="text-center">{{ employe.dateDeNaissance | date('d/m/Y') }}</td>
-                            <td class="text-center">{{ employe.photo }}</td>
+                            <td class="text-center">{{ employe.photo ? '<span class="btn btn-sm btn-success"><i class="fa-solid fa-check"></i></span>' : 'Null' }}</td>
                             <td>
                                 <a href="{{ path('update_employe', {'id': employe.id}) }}" class="btn btn-sm btn-primary" title="Modifier un employé"><i class="fa-solid fa-user-pen"></i></a> |
                                 <a href="{{ path('delete_employe', {'id': employe.id}) }}" class="btn btn-sm btn-danger" title="Supprimer un employé" onclick="return confirm('Voulez-vous vraiment supprimer cet employé du système ?')" ><i class="fa-solid fa-trash"></i></a>

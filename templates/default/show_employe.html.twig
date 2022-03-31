@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fiche d'un employé{% endblock %}
+
+{% block body %}
+
+    <h1 class="text-center mt-3">Fiche de l'employé {{ employe.fullname }}</h1>
+
+    <div class="row">
+        <div class="col-8 mx-auto">
+
+            <div class="card">
+                <img src="{{ asset('uploads/' ~ employe.photo) }}" class="card-img-top custom-img-card" alt="">
+                <div class="card-body">
+                    <h5 class="card-title text-center">{{ employe.fullname }}</h5>
+
+                    <ul class="list-group list-group-flush">
+
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-4">Tél: {{ employe.telephone }} </div>
+                                <div class="col-4">Email: {{ employe.email }} </div>
+                                <div class="col-4">Anniversaire: {{ employe.dateDeNaissance | date('d/m/Y') }}</div>
+                            </div>
+                        </li>
+
+                        <li class="list-group-item">Adresse : {{ employe.adresse }}</li>
+
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-6">Service : {{ employe.poste }}</div>
+                                <div class="col-6">Salaire : {{ employe.salaire }}</div>
+                            </div>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
