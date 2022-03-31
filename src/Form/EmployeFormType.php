@@ -7,10 +7,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class EmployeFormType extends AbstractType
 {
@@ -69,6 +71,9 @@ class EmployeFormType extends AbstractType
                 'help' => '<i>Date de naissance</i>',
                 'help_html' => true,
             ])
+            ->add('photo', FileType::class, [
+                'label' => 'Photo',
+            ])
         ;
     }
 
@@ -76,6 +81,7 @@ class EmployeFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Employe::class,
+            'allow_file_upload' => true,
         ]);
     }
 }

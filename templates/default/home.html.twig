@@ -22,7 +22,7 @@
 
     {#    /////////////////////////////////////////////////////////// TABLE ////////////////////////////////////////////////////////#}
     <div class="row">
-        <div class="col-10 mx-auto">
+        <div class="col-11 mx-auto">
 
             <table class="table">
                 <thead>
@@ -36,6 +36,7 @@
                         <th>Poste occupé</th>
                         <th>Salaire</th>
                         <th>Date de naissance</th>
+                        <th>Photo</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -43,15 +44,16 @@
 
                     {% for employe in employes | reverse %}
                         <tr>
-                            <td>{{ employe.id }}</td>
-                            <td>{{ employe.prenom }}</td>
-                            <td>{{ employe.nom }}</td>
-                            <td>{{ employe.telephone }}</td>
-                            <td>{{ employe.email }}</td>
-                            <td>{{ employe.adresse }}</td>
-                            <td>{{ employe.poste }}</td>
-                            <td>{{ employe.salaire }}</td>
-                            <td>{{ employe.dateDeNaissance | date('d/m/Y') }}</td>
+                            <td class="text-center">{{ employe.id }}</td>
+                            <td class="text-center">{{ employe.prenom | title }}</td>
+                            <td class="text-center">{{ employe.nom | upper }}</td>
+                            <td class="text-center">{{ employe.telephone }}</td>
+                            <td class="text-center">{{ employe.email | lower }}</td>
+                            <td class="text-center">{{ employe.adresse }}</td>
+                            <td class="text-center">{{ employe.poste | capitalize }}</td>
+                            <td class="text-center">{{ employe.salaire }}</td>
+                            <td class="text-center">{{ employe.dateDeNaissance | date('d/m/Y') }}</td>
+                            <td class="text-center">{{ employe.photo }}</td>
                             <td>
                                 <a href="{{ path('update_employe', {'id': employe.id}) }}" class="btn btn-sm btn-primary" title="Modifier un employé"><i class="fa-solid fa-user-pen"></i></a> |
                                 <a href="{{ path('delete_employe', {'id': employe.id}) }}" class="btn btn-sm btn-danger" title="Supprimer un employé" onclick="return confirm('Voulez-vous vraiment supprimer cet employé du système ?')" ><i class="fa-solid fa-trash"></i></a>
@@ -110,6 +112,10 @@
                 <div class="col-3">
                     {{ form_row(form.poste) }}
                 </div>
+            </div>
+
+            <div class="row">
+                {{ form_row(form.photo) }}
             </div>
 
             <div class="row mt-2">

@@ -57,6 +57,11 @@ class Employe
      */
     private $dateDeNaissance;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $photo;
+
 
 
     public function getFullname(): ?string
@@ -161,6 +166,18 @@ class Employe
     public function setDateDeNaissance(\DateTimeInterface $dateDeNaissance): self
     {
         $this->dateDeNaissance = $dateDeNaissance;
+
+        return $this;
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(string $photo): self
+    {
+        $this->photo = $photo;
 
         return $this;
     }

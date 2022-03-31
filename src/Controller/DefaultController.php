@@ -6,9 +6,14 @@ use App\Entity\Employe;
 use App\Form\EmployeFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class DefaultController extends AbstractController
 {
@@ -26,7 +31,7 @@ class DefaultController extends AbstractController
      *
      * @Route("/", name="show_home", methods={"GET|POST"})
      */
-    public function home(Request $request, EntityManagerInterface $entityManager): Response
+    public function home(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         // On récupère et variabilise tous les employés inscrits en BDD grâce à $entityManager.
         // On demande le Repository de Employe::class et on utlise la methode findAll().
@@ -49,6 +54,47 @@ class DefaultController extends AbstractController
             // Cas où la valeur du champ 'poste' est null
             if($form->get('poste')->getData() === null) {
                 $this->addFlash('warning', 'Vous devez renseigner un poste pour l\'employé');
+                return $this->redirectToRoute('show_home');
+            }
+
+            // Symfony retourne un objet de type UploadedFile lorsque nous avon un input type file dans notre formulaire.
+            /** @var UploadedFile $photo */
+            $photo = $form->get('photo')->getData();
+
+            // Avant de déplacer le fichier dans notre projet, nous devons déconstruire le nom du fichier pour le sécuriser.
+
+            // ============================ 1ère ETAPE ============================ //
+            # On variabilise l'extension grâce à la méthode guessExtension() d'UploadedFile
+            $extension = '.' . $photo->guessExtension();
+
+            # pathinfo() est une fonction native de PHP, elle permet de récupérer des infos d'un fichier uploadé..
+            $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
+
+            # On a injecté l'objet Slugger pour pouvoir "assainir" le nom du fichier.
+                    # Cela retire les accents et espaces (=> '-') du nom du fichier..
+//            $safeFilename = $slugger->slug($originalFilename);
+            $safeFilename = $slugger->slug($employe->getFullname());
+
+            // ============================ 2ème ETAPE ============================ //
+            # On reconstruit le nom du fichier grâce à $safeFilename, un id unique et l'extension.
+            $newFilename = $safeFilename . '_' . uniqid() . $extension;
+//dd($this->getParameter('uploads_dir'));
+            // ============================ 3ème ETAPE ============================ //
+            # On déplace le fichier dans le dossier voulu (choisi), qui est définit dans service.yaml (parameters)
+
+            try {
+                // On essaye de move() le fichier dans notre dossier 'public/uploads'
+                $photo->move($this->getParameter('uploads_dir'), $newFilename);
+                // On set le nom de la photo en BDD
+                $employe->setPhoto($newFilename);
+
+            } catch(FileException $exception) {
+                // Pour avoir le message de l'Exception lancée, on getMessage()
+                     # => $exception->getMessage();
+
+                // Si le move() du fichier a échoué, alors l'erreur lancée est attrapée.
+                // L'erreur est invisible pour l'utilisateur et le code suivant sera exécuté.
+                $this->addFlash('warning', 'Problème avec l\'upload du fichier, veuillez réessayer.');
                 return $this->redirectToRoute('show_home');
             }
 
