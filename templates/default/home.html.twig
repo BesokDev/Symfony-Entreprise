@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Accueil {% endblock %}
+
+{% block body %}
+
+    <h1 class="text-center my-5">Tous les employés</h1>
+
+{#    {{ dump(app.flashes) }}#}
+
+{#  Pour afficher les messages flashes qu'on ajoute depuis le Controller, on utilise ces deux loop for  #}
+    {% for label, messages in app.flashes %}
+
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                <span><i class="fa-solid fa-exclamation-triangle"></i></span>
+                <span><strong>{{ message | raw }}</strong></span>
+            </div>
+        {% endfor %}
+
+    {% endfor %}
+
+    {#    /////////////////////////////////////////////////////////// TABLE ////////////////////////////////////////////////////////#}
+    <div class="row">
+        <div class="col-10 mx-auto">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Prénom</th>
+                        <th>Nom</th>
+                        <th>Téléphone</th>
+                        <th>Email</th>
+                        <th>Adresse</th>
+                        <th>Poste occupé</th>
+                        <th>Salaire</th>
+                        <th>Date de naissance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for employe in employes | reverse %}
+                        <tr>
+                            <td>{{ employe.id }}</td>
+                            <td>{{ employe.prenom }}</td>
+                            <td>{{ employe.nom }}</td>
+                            <td>{{ employe.telephone }}</td>
+                            <td>{{ employe.email }}</td>
+                            <td>{{ employe.adresse }}</td>
+                            <td>{{ employe.poste }}</td>
+                            <td>{{ employe.salaire }}</td>
+                            <td>{{ employe.dateDeNaissance | date('d/m/Y') }}</td>
+                            <td>
+                                <a href="{{ path('update_employe', {'id': employe.id}) }}" class="btn btn-sm btn-primary" title="Modifier un employé"><i class="fa-solid fa-user-pen"></i></a> |
+                                <a href="{{ path('delete_employe', {'id': employe.id}) }}" class="btn btn-sm btn-danger" title="Supprimer un employé" onclick="return confirm('Voulez-vous vraiment supprimer cet employé du système ?')" ><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+            <div class="row mt-2 bg-dark text-white p-2">Total employés: {{ employes | length }}</div>
+
+        </div>
+    </div>
+
+{#    /////////////////////////////////////////////////////////// FORMULAIRE ////////////////////////////////////////////////////////#}
+
+    <div class="row mt-5">
+        <div class="col-10 mx-auto">
+
+            {{ form_start(form, {'attr': {novalidate: 'novalidate'}}) }}
+
+
+            {# //////////////////////// 1 ere ligne ///////////////////////#}
+            <div class="row">
+                <div class="col-3">
+                    {{ form_row(form.prenom) }}
+                </div>
+
+                <div class="col-3">
+                    {{ form_row(form.nom) }}
+                </div>
+
+                <div class="col-3">
+                    {{ form_row(form.telephone) }}
+                </div>
+
+                <div class="col-3">
+                    {{ form_row(form.email) }}
+                </div>
+            </div>
+
+{#            //////////////////////// 2 eme ligne ///////////////////////#}
+            <div class="row">
+                <div class="col-3">
+                    {{ form_row(form.adresse) }}
+                </div>
+                <div class="col-3">
+                    {{ form_row(form.salaire) }}
+
+                </div>
+                <div class="col-3">
+                    {{ form_row(form.dateDeNaissance) }}
+
+                </div>
+                <div class="col-3">
+                    {{ form_row(form.poste) }}
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <button type="submit" class="d-block col-12 btn btn-success ">Valider le formulaire</button>
+            </div>
+
+
+            {{ form_end(form) }}
+
+        </div>
+    </div>
+
+{% endblock %}

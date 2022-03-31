@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un employé{% endblock %}
+
+{% block body %}
+
+    <h1 class="text-center my-4">Modifier l'employé {{ employe.fullname }}</h1>
+
+{# /////////////////////////////////////////////////////////// FORMULAIRE //////////////////////////////////////////////////////// #}
+    <div class="row mt-5">
+        <div class="col-10 mx-auto">
+
+            {{ form_start(form, {'attr': {novalidate: 'novalidate'}}) }}
+
+
+            {# //////////////////////// 1 ere ligne /////////////////////// #}
+            <div class="row">
+                <div class="col-3">
+                    {{ form_row(form.prenom) }}
+                </div>
+
+                <div class="col-3">
+                    {{ form_row(form.nom) }}
+                </div>
+
+                <div class="col-3">
+                    {{ form_row(form.telephone) }}
+                </div>
+
+                <div class="col-3">
+                    {{ form_row(form.email) }}
+                </div>
+            </div>
+
+            {# //////////////////////// 2 eme ligne ///////////////////////#}
+            <div class="row">
+                <div class="col-3">
+                    {{ form_row(form.adresse) }}
+                </div>
+                <div class="col-3">
+                    {{ form_row(form.salaire) }}
+
+                </div>
+                <div class="col-3">
+                    {{ form_row(form.dateDeNaissance) }}
+
+                </div>
+                <div class="col-3">
+                    {{ form_row(form.poste) }}
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <button type="submit" class="d-block col-12 btn btn-success ">Modifier</button>
+            </div>
+
+
+            {{ form_end(form) }}
+
+        </div>
+    </div>
+
+{% endblock %}
+
+
