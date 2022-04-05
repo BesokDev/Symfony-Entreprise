@@ -73,6 +73,9 @@ class EmployeFormType extends AbstractType
             ])
             ->add('photo', FileType::class, [
                 'label' => 'Photo',
+                'attr' => [
+                    'value' => $options['photo'] ?? '',
+                ],
             ])
         ;
     }
