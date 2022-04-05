@@ -73,6 +73,10 @@ class EmployeFormType extends AbstractType
             ])
             ->add('photo', FileType::class, [
                 'label' => 'Photo',
+                'data_class' => null,
+                'attr' => [
+                    'value' => $options['photo'] ?? '',
+                ],
             ])
         ;
     }
@@ -82,6 +86,7 @@ class EmployeFormType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Employe::class,
             'allow_file_upload' => true,
+            'photo' => null,
         ]);
     }
 }

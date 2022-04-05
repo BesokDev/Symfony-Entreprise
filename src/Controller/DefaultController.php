@@ -130,12 +130,59 @@ class DefaultController extends AbstractController
      *
      * @Route("/modifier-un-employe_{id}", name="update_employe", methods={"GET|POST"})
      */
-    public function updateEmploye(Employe $employe, Request $request, EntityManagerInterface $entityManager): Response
+    public function updateEmploye(Employe $employe, Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
-        $form = $this->createForm(EmployeFormType::class, $employe)
-            ->handleRequest($request);
+        $originalPhoto = $employe->getPhoto();
+
+        $form = $this->createForm(EmployeFormType::class, $employe, [
+            'photo' => $originalPhoto,
+        ])->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {
+
+            /** @var UploadedFile $photo */
+            $photo = $form->get('photo')->getData();
+
+            if($photo) {
+                // Avant de déplacer le fichier dans notre projet, nous devons déconstruire le nom du fichier pour le sécuriser.
+
+                // ============================ 1ère ETAPE ============================ //
+                # On variabilise l'extension grâce à la méthode guessExtension() d'UploadedFile
+                $extension = '.' . $photo->guessExtension();
+
+                # pathinfo() est une fonction native de PHP, elle permet de récupérer des infos d'un fichier uploadé..
+                $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
+
+                # On a injecté l'objet Slugger pour pouvoir "assainir" le nom du fichier.
+                # Cela retire les accents et espaces (=> '-') du nom du fichier..
+//            $safeFilename = $slugger->slug($originalFilename);
+                $safeFilename = $slugger->slug($employe->getFullname());
+
+                // ============================ 2ème ETAPE ============================ //
+                # On reconstruit le nom du fichier grâce à $safeFilename, un id unique et l'extension.
+                $newFilename = $safeFilename . '_' . uniqid() . $extension;
+
+                // ============================ 3ème ETAPE ============================ //
+                # On déplace le fichier dans le dossier voulu (choisi), qui est définit dans service.yaml (parameters)
+
+                try {
+                    // On essaye de move() le fichier dans notre dossier 'public/uploads'
+                    $photo->move($this->getParameter('uploads_dir'), $newFilename);
+                    // On set le nom de la photo en BDD
+                    $employe->setPhoto($newFilename);
+
+                } catch(FileException $exception) {
+                    // Pour avoir le message de l'Exception lancée, on getMessage()
+                    # => $exception->getMessage();
+
+                    // Si le move() du fichier a échoué, alors l'erreur lancée est attrapée.
+                    // L'erreur est invisible pour l'utilisateur et le code suivant sera exécuté.
+                    $this->addFlash('warning', 'Problème avec l\'upload du fichier, veuillez réessayer.');
+                    return $this->redirectToRoute('show_home');
+                }
+            } else {
+                $employe->setPhoto($originalPhoto);
+            }
 
             $entityManager->persist($employe);
             $entityManager->flush();
