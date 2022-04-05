@@ -86,8 +86,7 @@
             "@auto-scripts"
         ],
         "compile": [
-            "php bin/console doctrine:schema:update --force --no-interaction",
-            "yarn install"
+            "php bin/console doctrine:schema:update --force --no-interaction"
         ]
     },
     "conflict": {
